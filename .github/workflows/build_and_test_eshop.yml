@@ -1,4 +1,4 @@
-name: eShop
+name: eShop for DevOps
 
 on:
   workflow_dispatch:
