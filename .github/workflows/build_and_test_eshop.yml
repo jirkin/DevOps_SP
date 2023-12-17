@@ -1,4 +1,4 @@
-name: eShop
+name: eShop test
 
 on:
   workflow_dispatch:
