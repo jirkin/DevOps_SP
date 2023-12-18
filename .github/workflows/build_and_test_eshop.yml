@@ -123,5 +123,5 @@ jobs:
         run: |
           echo "${{ secrets.AWS_KEY_PEM }}" | base64 -d > test.pem
           chmod 400 test.pem
-          sudo ansible-playbook ansible/playbook.yml --user ec2-user --key-file test.pem
+          sudo ansible-playbook ansible/playbook.yml --user ec2-user --key-file test.pem -e "ansible_ssh_common_args='-o StrictHostKeyChecking=no'" -e "aws_access_key=${{ secrets.AWS_ACCESS_KEY_ID }}" -e "aws_secret_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" -e "aws_session_token=${{ secrets.AWS_SESSION_TOKEN }}"
           rm test.pem
