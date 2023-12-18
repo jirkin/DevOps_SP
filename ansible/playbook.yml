@@ -97,6 +97,9 @@
           "tag:Name": "prod"
           "instance-state-name": "running"
         region: us-east-1
+        aws_access_key: "{{ access_key }}"
+        aws_secret_key: "{{ secret_key }}"
+        security_token: "{{ session_token }}"
       register: all_instances
 
     - name: List & Sort Instances 
@@ -116,6 +119,9 @@
       ec2_instance:
         state: 'absent'
         instance_ids: "{{ instances_to_terminate }}"
+        aws_access_key: "{{ access_key }}"
+        aws_secret_key: "{{ secret_key }}"
+        security_token: "{{ session_token }}"
         region: us-east-1
       when: instances_to_terminate | length > 0
 
