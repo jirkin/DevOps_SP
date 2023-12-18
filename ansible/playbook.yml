@@ -12,7 +12,7 @@
         vpc_subnet_id: subnet-083d59eaf87353de9
         count: 1
         network:
-            assign_public_ip: yes
+          assign_public_ip: yes
         wait: yes
         security_group: eshop
         aws_access_key: "{{ access_key }}"
@@ -22,9 +22,9 @@
 
     - name: Add instance host to sec group
       add_host:
-        hostname: "{{item.public_ip_address}}"
+        hostname: "{{ item.public_ip_address }}"
         groupname: launched
-      loop: "{{ec2_instance_result.instances}}"
+      loop: "{{ ec2_instance_result.instances }}"
 
     - name: Wait for SSH connection
       delegate_to: "{{ item.public_ip_address }}"
