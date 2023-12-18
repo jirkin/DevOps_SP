@@ -55,6 +55,7 @@ jobs:
         run: |
           npm rebuild node-sass --force
           npm run build -- --colors
+
       - name: Cache node modules and build folder
         if: ${{ github.ref == 'refs/heads/main' }}
         uses: actions/cache@v3.3.2
@@ -90,3 +91,37 @@ jobs:
       - name: Run tests
         run: |
           npm run test -- --colors
+
+  Deploy:
+    needs: [Build, Test]
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.1.1
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install Ansible and Boto libraries
+        run: sudo pip3 install ansible boto boto3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: us-east-1
+
+      - name: Run Ansible Playbook
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: false
+        run: |
+          echo "${{ secrets.AWS_KEY_PEM }}" | base64 -d > test.pem
+          chmod 400 test.pem
+          sudo ansible-playbook ansible/playbook.yml --user ec2-user --key-file test.pem
+          rm test.pem
