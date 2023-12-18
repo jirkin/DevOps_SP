@@ -109,13 +109,19 @@ jobs:
       - name: Install Ansible and Boto libraries
         run: sudo pip3 install ansible boto boto3
 
-      - name: Deploy with Ansible
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: us-east-1
+
+      - name: Run Ansible Playbook
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+          ANSIBLE_HOST_KEY_CHECKING: false
         run: |
           echo "${{ secrets.AWS_KEY_PEM }}" > test.pem
           chmod 400 test.pem
-          sudo ansible-playbook ansible/playbook.yml --user ec2-user --key-file test.pem -e "access_key=${AWS_ACCESS_KEY_ID}" -e "secret_key=${AWS_SECRET_ACCESS_KEY}" -e "session_token=${AWS_SESSION_TOKEN}"
+          sudo ansible-playbook ansible/playbook.yml --user ec2-user --key-file test.pem -e "ansible_ssh_common_args='-o StrictHostKeyChecking=no'" -e "access_key=${{ secrets.AWS_ACCESS_KEY_ID }}" -e "secret_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" -e "session_token=${{ secrets.AWS_SESSION_TOKEN }}"
           rm test.pem
