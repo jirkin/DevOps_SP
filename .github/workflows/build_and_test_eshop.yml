@@ -121,7 +121,7 @@ jobs:
         env:
           ANSIBLE_HOST_KEY_CHECKING: false
         run: |
-          echo "${{ secrets.AWS_KEY_PEM }}" > test.pem
+          echo "${{ secrets.AWS_KEY_PEM }}" | base64 -d > test.pem
           chmod 400 test.pem
           sudo ansible-playbook ansible/playbook.yml --user ec2-user --key-file test.pem -e "ansible_ssh_common_args='-o StrictHostKeyChecking=no'" -e "access_key=${{ secrets.AWS_ACCESS_KEY_ID }}" -e "secret_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" -e "session_token=${{ secrets.AWS_SESSION_TOKEN }}"
           rm test.pem
